@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VBS BOUW – Constructie & Bouw Antwerpen</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f2ee;
+    --steel: #c8bfb0;
+    --orange: #e85c1a;
+    --orange-dark: #b8431a;
+    --gray: #1e1e1e;
+    --mid: #3a3a3a;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--orange);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, opacity 0.2s;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(232,92,26,0.5);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.35s ease, width 0.3s, height 0.3s;
+    transform: translate(-50%, -50%);
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 60px;
+    mix-blend-mode: normal;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.95) 0%, transparent 100%);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.15em;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--orange); }
+  .nav-links {
+    display: flex; gap: 48px; list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--steel);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--orange); }
+  .nav-cta {
+    background: var(--orange);
+    color: var(--black) !important;
+    padding: 10px 24px;
+    font-weight: 600 !important;
+    transition: background 0.3s !important;
+  }
+  .nav-cta:hover { background: var(--white) !important; color: var(--black) !important; }
+
+  /* HERO */
+  .hero {
+    height: 100vh;
+    position: relative;
+    display: flex; align-items: flex-end;
+    padding: 0 60px 80px;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(135deg, rgba(10,10,10,0.7) 0%, rgba(10,10,10,0.3) 50%, rgba(10,10,10,0.8) 100%),
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 60px,
+        rgba(232,92,26,0.03) 60px,
+        rgba(232,92,26,0.03) 61px
+      );
+    background-color: #1a1410;
+  }
+  /* Animated construction lines */
+  .hero-lines {
+    position: absolute; inset: 0; overflow: hidden;
+  }
+  .line {
+    position: absolute;
+    background: var(--orange);
+    opacity: 0.15;
+    animation: lineDraw 3s ease forwards;
+    transform-origin: left center;
+    transform: scaleX(0);
+  }
+  @keyframes lineDraw {
+    to { transform: scaleX(1); }
+  }
+  .l1 { top: 20%; left: 0; width: 40%; height: 1px; animation-delay: 0.3s; }
+  .l2 { top: 50%; left: 10%; width: 25%; height: 1px; animation-delay: 0.6s; }
+  .l3 { top: 70%; left: 0; width: 60%; height: 1px; animation-delay: 0.9s; }
+  .l4 { top: 35%; right: 0; width: 30%; height: 1px; animation-delay: 1.1s; transform-origin: right center; }
+  /* vertical */
+  .lv1 { top: 0; left: 25%; width: 1px; height: 100%; background: var(--orange); opacity: 0.06; animation: none; transform: none; }
+  .lv2 { top: 0; right: 30%; width: 1px; height: 100%; background: var(--orange); opacity: 0.04; animation: none; transform: none; }
+
+  .hero-label {
+    position: absolute; top: 120px; left: 60px;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--orange);
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s ease forwards;
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 900px; }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 12vw, 11rem);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    animation: fadeUp 1s 0.2s ease forwards;
+  }
+  .hero-title .accent { color: var(--orange); }
+  .hero-title .outline {
+    -webkit-text-stroke: 1px var(--white);
+    color: transparent;
+  }
+  .hero-subtitle {
+    margin-top: 32px;
+    font-size: 1.05rem;
+    font-weight: 300;
+    color: var(--steel);
+    max-width: 500px;
+    line-height: 1.7;
+    opacity: 0;
+    animation: fadeUp 1s 0.5s ease forwards;
+  }
+  .hero-actions {
+    margin-top: 48px;
+    display: flex; gap: 20px; align-items: center;
+    opacity: 0;
+    animation: fadeUp 1s 0.8s ease forwards;
+  }
+  .btn-primary {
+    background: var(--orange);
+    color: var(--black);
+    padding: 16px 40px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+  .btn-primary:hover {
+    background: var(--white);
+    transform: translateY(-2px);
+  }
+  .btn-ghost {
+    color: var(--white);
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-bottom: 1px solid var(--mid);
+    padding-bottom: 4px;
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .btn-ghost:hover { border-color: var(--orange); color: var(--orange); }
+
+  .hero-stats {
+    position: absolute; right: 60px; bottom: 80px;
+    display: flex; flex-direction: column; gap: 32px;
+    text-align: right;
+    opacity: 0;
+    animation: fadeIn 1s 1.2s ease forwards;
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    color: var(--orange);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin-top: 4px;
+  }
+
+  /* SCROLL INDICATOR */
+  .scroll-ind {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0;
+    animation: fadeIn 1s 1.5s forwards;
+  }
+  .scroll-ind span {
+    font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--steel);
+  }
+  .scroll-line {
+    width: 1px; height: 60px; background: linear-gradient(to bottom, var(--orange), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.1); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* SECTION COMMON */
+  section { padding: 120px 60px; }
+  .section-tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: 0.03em;
+  }
+
+  /* SERVICES */
+  .services { background: var(--gray); }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    margin-top: 72px;
+    background: var(--mid);
+  }
+  .service-card {
+    background: var(--gray);
+    padding: 52px 40px;
+    transition: background 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--orange);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+  .service-card:hover { background: #252525; }
+  .service-card:hover::before { transform: scaleX(1); }
+  .service-icon {
+    font-size: 2.5rem;
+    margin-bottom: 28px;
+    display: block;
+  }
+  .service-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    color: var(--orange);
+    margin-bottom: 16px;
+  }
+  .service-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.9rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+  .service-desc {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--steel);
+  }
+
+  /* PROJECTS */
+  .projects { background: var(--black); }
+  .projects-header {
+    display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 72px;
+  }
+  .project-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 3px;
+  }
+  .project-item {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16/10;
+    background: var(--gray);
+    cursor: none;
+  }
+  .project-item:first-child {
+    grid-row: 1 / 3;
+    aspect-ratio: auto;
+  }
+  .project-bg {
+    position: absolute; inset: 0;
+    transition: transform 0.6s ease;
+  }
+  .p1 { background: linear-gradient(135deg, #1a1208 0%, #2d1f0e 100%); }
+  .p2 { background: linear-gradient(135deg, #0e1a1a 0%, #1a2d2d 100%); }
+  .p3 { background: linear-gradient(135deg, #1a0e0e 0%, #2d1a1a 100%); }
+  .p4 { background: linear-gradient(135deg, #0e0e1a 0%, #1a1a2d 100%); }
+
+  /* Construction pattern overlays */
+  .project-bg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px);
+  }
+  .project-item:hover .project-bg { transform: scale(1.05); }
+  .project-info {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 36px 32px;
+    background: linear-gradient(to top, rgba(10,10,10,0.95) 0%, transparent 100%);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.4s;
+  }
+  .project-item:hover .project-info { transform: translateY(0); opacity: 1; }
+  .project-cat {
+    font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 8px;
+  }
+  .project-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem; letter-spacing: 0.05em;
+  }
+  .project-label {
+    position: absolute; top: 24px; left: 24px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem; letter-spacing: 0.1em;
+    color: rgba(245,242,238,0.3);
+  }
+
+  /* WHY US */
+  .why { background: var(--orange); color: var(--black); }
+  .why .section-tag { color: var(--black); opacity: 0.5; }
+  .why .section-title { color: var(--black); }
+  .why-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 48px; margin-top: 72px;
+  }
+  .why-item {}
+  .why-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem;
+    line-height: 1;
+    opacity: 0.15;
+    margin-bottom: 16px;
+  }
+  .why-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    color: var(--black);
+  }
+  .why-text {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: rgba(10,10,10,0.65);
+  }
+
+  /* CONTACT */
+  .contact { background: var(--black); }
+  .contact-inner {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 100px; margin-top: 72px;
+  }
+  .contact-info {}
+  .contact-details { margin-top: 48px; display: flex; flex-direction: column; gap: 28px; }
+  .contact-item {
+    display: flex; align-items: flex-start; gap: 20px;
+  }
+  .contact-icon { color: var(--orange); font-size: 1.2rem; margin-top: 2px; }
+  .contact-text-label {
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--steel); margin-bottom: 4px;
+  }
+  .contact-text-val { font-size: 0.95rem; color: var(--white); }
+
+  .contact-form { display: flex; flex-direction: column; gap: 20px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  label {
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--steel);
+  }
+  input, textarea, select {
+    background: var(--gray);
+    border: 1px solid var(--mid);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.95rem;
+    padding: 14px 18px;
+    outline: none;
+    transition: border-color 0.3s;
+    cursor: none;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--orange); }
+  textarea { resize: vertical; min-height: 120px; }
+  select option { background: var(--gray); }
+
+  .submit-btn {
+    background: var(--orange);
+    color: var(--black);
+    border: none;
+    padding: 18px 48px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: none;
+    align-self: flex-start;
+    transition: all 0.3s;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+  .submit-btn:hover { background: var(--white); transform: translateY(-2px); }
+
+  /* FOOTER */
+  footer {
+    background: var(--gray);
+    padding: 60px 60px 40px;
+    border-top: 1px solid var(--mid);
+  }
+  .footer-top {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--mid);
+    margin-bottom: 36px;
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem; letter-spacing: 0.1em;
+    color: var(--white);
+  }
+  .footer-logo span { color: var(--orange); }
+  .footer-tagline {
+    font-size: 0.8rem; color: var(--steel); letter-spacing: 0.1em; margin-top: 4px;
+  }
+  .footer-links { display: flex; gap: 36px; }
+  .footer-links a {
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--steel); text-decoration: none; transition: color 0.3s;
+  }
+  .footer-links a:hover { color: var(--orange); }
+  .footer-bottom {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-copy { font-size: 0.75rem; color: var(--mid); }
+  .footer-addr { font-size: 0.75rem; color: var(--mid); text-align: right; }
+
+  /* Noise overlay */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 9997;
+  }
+
+  /* Reveal animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 1024px) {
+    nav { padding: 24px 30px; }
+    .nav-links { gap: 28px; }
+    section { padding: 80px 30px; }
+    .hero { padding: 0 30px 80px; }
+    .hero-stats { right: 30px; }
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+    .project-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .project-item:first-child { grid-row: auto; }
+    .why-grid { grid-template-columns: repeat(2, 1fr); }
+    .contact-inner { grid-template-columns: 1fr; gap: 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">VBS<span>.</span>BOUW</a>
+  <ul class="nav-links">
+    <li><a href="#diensten">Diensten</a></li>
+    <li><a href="#projecten">Projecten</a></li>
+    <li><a href="#over">Over ons</a></li>
+    <li><a href="#contact" class="nav-cta">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-lines">
+      <div class="line l1"></div>
+      <div class="line l2"></div>
+      <div class="line l3"></div>
+      <div class="line l4"></div>
+      <div class="line lv1"></div>
+      <div class="line lv2"></div>
+    </div>
+  </div>
+  <div class="hero-label">— Constructie &amp; Bouw Antwerpen</div>
+  <div class="hero-content">
+    <h1 class="hero-title">
+      WIJ<br>
+      <span class="accent">BOUWEN</span><br>
+      <span class="outline">JOUW VISIE</span>
+    </h1>
+    <p class="hero-subtitle">
+      Van fundament tot afwerking. VBS BOUW levert vakmanschap, betrouwbaarheid en precisie op elk bouwproject in Antwerpen en omgeving.
+    </p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">Offerte Aanvragen</a>
+      <a href="#projecten" class="btn-ghost">Onze Projecten →</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="stat-num">15+</div>
+      <div class="stat-label">Jaar ervaring</div>
+    </div>
+    <div>
+      <div class="stat-num">200+</div>
+      <div class="stat-label">Projecten voltooid</div>
+    </div>
+    <div>
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Kwaliteitsgarantie</div>
+    </div>
+  </div>
+  <div class="scroll-ind">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services reveal" id="diensten">
+  <div class="section-tag">— Wat wij doen</div>
+  <h2 class="section-title">Onze<br>Diensten</h2>
+  <div class="services-grid">
+    <div class="service-card">
+      <span class="service-icon">🏗️</span>
+      <div class="service-num">01</div>
+      <div class="service-name">Nieuwbouw</div>
+      <p class="service-desc">Volledige begeleiding van grondwerk tot sleuteloverdracht. Wij bouwen uw woning, handelspand of industrieel gebouw van A tot Z.</p>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">🔨</span>
+      <div class="service-num">02</div>
+      <div class="service-name">Renovatie</div>
+      <p class="service-desc">Uw bestaand gebouw nieuw leven inblazen. Structurele aanpassingen, gevelbekleding, dakwerken en volledige binnenrenovaties.</p>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">📐</span>
+      <div class="service-num">03</div>
+      <div class="service-name">Ruwbouw</div>
+      <p class="service-desc">Funderingen, metselwerk, betonwerken en draagstructuren. De solide basis voor elk bouwproject, nauwkeurig uitgevoerd.</p>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">🏢</span>
+      <div class="service-num">04</div>
+      <div class="service-name">Commerciële Bouw</div>
+      <p class="service-desc">Kantoren, winkelpanden en bedrijfsgebouwen op maat gebouwd. Functioneel, duurzaam en representatief voor uw merk.</p>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">🌿</span>
+      <div class="service-num">05</div>
+      <div class="service-name">Duurzame Bouw</div>
+      <p class="service-desc">Energiezuinige oplossingen, isolatiewerken en groene bouwmethoden. Bouwen voor de toekomst met oog voor het milieu.</p>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">🔧</span>
+      <div class="service-num">06</div>
+      <div class="service-name">Onderhoud &amp; Herstel</div>
+      <p class="service-desc">Snelle en vakkundige herstellingen, preventief onderhoud en urgent herstelwerk voor particulieren en bedrijven.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="projects reveal" id="projecten">
+  <div class="projects-header">
+    <div>
+      <div class="section-tag">— Ons portfolio</div>
+      <h2 class="section-title">Recente<br>Realisaties</h2>
+    </div>
+    <a href="#" class="btn-ghost">Alle projecten →</a>
+  </div>
+  <div class="project-grid">
+    <div class="project-item">
+      <div class="project-bg p1"></div>
+      <div class="project-label">01</div>
+      <div class="project-info">
+        <div class="project-cat">Residentieel · 2024</div>
+        <div class="project-title">Villa Zurenborg, Antwerpen</div>
+      </div>
+    </div>
+    <div class="project-item">
+      <div class="project-bg p2"></div>
+      <div class="project-label">02</div>
+      <div class="project-info">
+        <div class="project-cat">Commercieel · 2024</div>
+        <div class="project-title">Kantoorgebouw Ranststraat</div>
+      </div>
+    </div>
+    <div class="project-item">
+      <div class="project-bg p3"></div>
+      <div class="project-label">03</div>
+      <div class="project-info">
+        <div class="project-cat">Renovatie · 2023</div>
+        <div class="project-title">Appartementscomplex Borgerhout</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section class="why reveal" id="over">
+  <div class="section-tag">— Waarom VBS BOUW</div>
+  <h2 class="section-title">Kwaliteit is<br>onze norm</h2>
+  <div class="why-grid">
+    <div class="why-item">
+      <div class="why-num">01</div>
+      <div class="why-title">Vakmanschap</div>
+      <p class="why-text">Elke schroef, elke steen, elke verbinding wordt geplaatst met jarenlange expertise en aandacht voor het kleinste detail.</p>
+    </div>
+    <div class="why-item">
+      <div class="why-num">02</div>
+      <div class="why-title">Transparantie</div>
+      <p class="why-text">Heldere communicatie, eerlijke prijzen en geen verrassingen achteraf. U weet altijd waar u aan toe bent.</p>
+    </div>
+    <div class="why-item">
+      <div class="why-num">03</div>
+      <div class="why-title">Op Tijd</div>
+      <p class="why-text">Deadlines zijn heilig. Wij leveren op het afgesproken moment, zodat u uw plannen kunt waarmaken.</p>
+    </div>
+    <div class="why-item">
+      <div class="why-num">04</div>
+      <div class="why-title">Lokale Roots</div>
+      <p class="why-text">Gevestigd in Antwerpen. Wij kennen de regio, de regelgeving en de lokale leveranciers door en door.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact reveal" id="contact">
+  <div class="section-tag">— Neem contact op</div>
+  <h2 class="section-title">Start Uw<br>Project</h2>
+  <div class="contact-inner">
+    <div class="contact-info">
+      <p style="color: var(--steel); line-height: 1.8; font-size: 1rem; max-width: 400px;">
+        Heeft u een bouwproject in gedachten? Neem contact op voor een vrijblijvende offerte of een eerste gesprek. Wij reageren binnen 24 uur.
+      </p>
+      <div class="contact-details">
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div class="contact-text-label">Adres</div>
+            <div class="contact-text-val">Ranststraat 34, 2140 Antwerpen</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div class="contact-text-label">Telefoon</div>
+            <div class="contact-text-val">+32 (0)3 XXX XX XX</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <div>
+            <div class="contact-text-label">E-mail</div>
+            <div class="contact-text-val">info@vbsbouw.be</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🕐</div>
+          <div>
+            <div class="contact-text-label">Openingstijden</div>
+            <div class="contact-text-val">Ma–Vr: 8:00 – 18:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="contact-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Voornaam</label>
+          <input type="text" placeholder="Jan">
+        </div>
+        <div class="form-group">
+          <label>Achternaam</label>
+          <input type="text" placeholder="Janssen">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>E-mailadres</label>
+        <input type="email" placeholder="jan@voorbeeld.be">
+      </div>
+      <div class="form-group">
+        <label>Telefoon</label>
+        <input type="tel" placeholder="+32 470 00 00 00">
+      </div>
+      <div class="form-group">
+        <label>Type project</label>
+        <select>
+          <option value="">Selecteer een type...</option>
+          <option>Nieuwbouw</option>
+          <option>Renovatie</option>
+          <option>Ruwbouw</option>
+          <option>Commerciële bouw</option>
+          <option>Duurzame bouw</option>
+          <option>Onderhoud & herstel</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Uw bericht</label>
+        <textarea placeholder="Beschrijf uw project of vraag..."></textarea>
+      </div>
+      <button class="submit-btn">Verstuur Aanvraag</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">VBS<span>.</span>BOUW</div>
+      <div class="footer-tagline">Bouwen met Vakmanschap · Antwerpen</div>
+    </div>
+    <div class="footer-links">
+      <a href="#diensten">Diensten</a>
+      <a href="#projecten">Projecten</a>
+      <a href="#over">Over ons</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 VBS BOUW. Alle rechten voorbehouden.</div>
+    <div class="footer-addr">Ranststraat 34 · 2140 Antwerpen · BTW BE 0XXX.XXX.XXX</div>
+  </div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, input, textarea, select').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(2)';
+      ring.style.width = '60px'; ring.style.height = '60px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+      ring.style.width = '36px'; ring.style.height = '36px';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => observer.observe(r));
+
+  // Smooth nav link scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Submit btn feedback
+  document.querySelector('.submit-btn').addEventListener('click', function() {
+    this.textContent = '✓ Verzonden!';
+    this.style.background = '#2d8a4e';
+    setTimeout(() => {
+      this.textContent = 'Verstuur Aanvraag';
+      this.style.background = '';
+    }, 3000);
+  });
+</script>
+</body>
+</html>
